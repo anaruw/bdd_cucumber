@@ -1,7 +1,6 @@
 package ru.netology.web.pages;
 
 import com.codeborne.selenide.SelenideElement;
-import ru.netology.web.data.UserInfo;
 
 import static com.codeborne.selenide.Selenide.$;
 
@@ -12,14 +11,14 @@ public class LoginPage {
     private final SelenideElement actionButton = $("[data-test-id='action-login']");
     private final SelenideElement errorNotification = $("[data-test-id='error-notification']");
 
-    public void auth(UserInfo user) {
-        loginInputField.setValue(user.getLogin());
-        passwordInputField.setValue(user.getPassword());
+    public void auth(String login, String password) {
+        loginInputField.setValue(login);
+        passwordInputField.setValue(password);
         actionButton.click();
     }
 
-    public VerificationPage validAuth(UserInfo user) {
-        auth(user);
+    public VerificationPage validAuth(String login, String password) {
+        auth(login, password);
         return new VerificationPage();
     }
 }

@@ -2,7 +2,6 @@ package ru.netology.web.pages;
 
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
-import ru.netology.web.data.VerificationCode;
 
 import java.time.Duration;
 
@@ -18,13 +17,13 @@ public class VerificationPage {
         codeInputField.shouldBe(Condition.visible, Duration.ofSeconds(15));
     }
 
-    public void verify(VerificationCode code) {
-        codeInputField.setValue(code.getCode());
+    public void verify(int verifyCode) {
+        codeInputField.setValue("" + verifyCode);
         verifyButton.click();
     }
 
-    public DashBoardPage validVerify(VerificationCode code) {
-        verify(code);
+    public DashBoardPage validVerify(int verifyCode) {
+        verify(verifyCode);
         return new DashBoardPage();
     }
 }

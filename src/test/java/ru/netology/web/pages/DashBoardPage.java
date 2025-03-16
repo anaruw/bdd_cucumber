@@ -2,15 +2,17 @@ package ru.netology.web.pages;
 
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
-import ru.netology.web.data.TransferInfo;
 import ru.netology.web.util.DataHelper;
 
 import java.time.Duration;
+import java.util.List;
 
 import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
 
 public class DashBoardPage {
 
+    private final List<SelenideElement> cardList = $$(".list__item");
     private final SelenideElement card1Info = $("[data-test-id='92df3f1c-a033-48e6-8390-206f6b1f56c0']");
     private final SelenideElement card2Info = $("[data-test-id='0f3f5c2a-249e-4c3d-8287-09f7a039391d']");
     private final SelenideElement reloadButton = $("[data-test-id='action-reload']");
@@ -24,36 +26,30 @@ public class DashBoardPage {
         ), Duration.ofSeconds(15));
     }
 
-    public SelenideElement cardChoice(String cardNumber) {
-        if (cardNumber.equals("5559 0000 0000 0001")) {
-            return card1Info;
-        } else if (cardNumber.equals("5559 0000 0000 0002")) {
-            return card2Info;
-        } else {
-            return null;
-        }
+    public SelenideElement cardChoice(int cardIndex) {
+        return cardList.get(cardIndex - 1);
     }
 
-    public void checkBalance(String cardNumber, int expectedBalance) {
-        cardChoice(cardNumber).shouldHave(Condition.exactText(
-                DataHelper.hiddenCardNumber(cardNumber) + ", баланс: " + expectedBalance + " р.\nПополнить"
-        ));
-    }
-
-    public TransferPage replenishment(TransferInfo planningTransfer) {
-        cardChoice(planningTransfer.getCardNumberTo()).$("[data-test-id='action-deposit']").click();
+    public TransferPage cardToReplenishment(int cardIndex) {
+        cardChoice(cardIndex).$("[data-test-id='action-deposit']").click();
         return new TransferPage();
     }
 
-    public void resultOfValidReplenishment(TransferInfo planningTransfer, int fromInitialBalance, int toInitialBalance) {
+    public int cardBalance(int selectedCardIndex) {
 
-        checkBalance(planningTransfer.getCardNumberFrom(), fromInitialBalance - planningTransfer.getAmount());
-        checkBalance(planningTransfer.getCardNumberTo(), toInitialBalance + planningTransfer.getAmount());
+        String beforeBalanceText = "**** **** **** ****, баланс: ";
+        String afterBalanceText = " р.\nПополнить";
+        String cardInfo = cardChoice(selectedCardIndex).getText();
+
+        return Integer.parseInt(cardInfo.substring(
+                beforeBalanceText.length(),
+                cardInfo.length() - afterBalanceText.length()
+        ));
     }
 
-    public void resultOfInvalidReplenishment(TransferInfo planningTransfer, int fromInitialBalance, int toInitialBalance) {
-
-        checkBalance(planningTransfer.getCardNumberFrom(), fromInitialBalance);
-        checkBalance(planningTransfer.getCardNumberTo(), toInitialBalance);
+    public void checkBalance(int cardIndex, int expectedBalance) {
+        cardList.get(cardIndex - 1).shouldHave(Condition.exactText(
+                "**** **** **** 000" + cardIndex + ", баланс: " + expectedBalance + " р.\nПополнить"
+        ));
     }
 }

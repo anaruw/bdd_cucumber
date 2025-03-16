@@ -2,7 +2,6 @@ package ru.netology.web.pages;
 
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
-import ru.netology.web.data.TransferInfo;
 import ru.netology.web.util.DataHelper;
 
 import java.time.Duration;
@@ -26,68 +25,25 @@ public class TransferPage {
         ), Duration.ofSeconds(15));
     }
 
-    public void inputAmount(TransferInfo planningTransfer) {
-        amountInputField.setValue("" + planningTransfer.getAmount());
+    public void inputAmount(int amount) {
+        amountInputField.setValue("" + amount);
     }
 
-    public void inputCardFrom(TransferInfo planningTransfer) {
-        cardFromInputField.setValue(planningTransfer.getCardNumberFrom());
+    public void inputCardFrom(String cardFromNumber) {
+        cardFromInputField.setValue(cardFromNumber);
     }
 
-    public void inputValues(TransferInfo planningTransfer) {
-        inputAmount(planningTransfer);
-        inputCardFrom(planningTransfer);
+    public void inputValues(int amount, String cardFromNumber) {
+        inputAmount(amount);
+        inputCardFrom(cardFromNumber);
     }
-
-    public void checkCardTo(TransferInfo planningTransfer) {
-        cardToInputField.shouldHave(Condition.value(
-                DataHelper.hiddenCardNumber(planningTransfer.getCardNumberTo())
-        ));
-    }
-
-    public DashBoardPage validTransfer(TransferInfo planningTransfer) {
-        inputValues(planningTransfer);
-        checkCardTo(planningTransfer);
-
+    public DashBoardPage validTransfer(int amount, String cardFromNumber) {
+        inputValues(amount, cardFromNumber);
         transferButton.click();
-
         return new DashBoardPage();
     }
 
     public DashBoardPage canceledTransfer() {
-        cancelButton.click();
-        return new DashBoardPage();
-    }
-
-    public void transferWithEmptyAmountField(TransferInfo planningTransfer) {
-        inputCardFrom(planningTransfer);
-        transferButton.click();
-        errorNotification.shouldBe(Condition.allOf(
-                Condition.visible,
-                Condition.exactText("Ошибка! Произошла ошибка")
-        ));
-    }
-
-    public void transferWithEmptyCardFromField(TransferInfo planningTransfer) {
-        inputAmount(planningTransfer);
-        transferButton.click();
-        errorNotification.shouldBe(Condition.allOf(
-                Condition.visible,
-                Condition.exactText("Ошибка! Произошла ошибка")
-        ));
-    }
-
-    public void transferWithAmountAboveBalance(TransferInfo planningTransfer) {
-        inputValues(planningTransfer);
-        transferButton.click();
-        errorNotification.shouldBe(Condition.allOf(
-                Condition.visible,
-                Condition.exactText("Ошибка! Произошла ошибка")
-        ));
-    }
-
-    public DashBoardPage canceledTransferWithCompletedInput(TransferInfo planningTransfer) {
-        inputValues(planningTransfer);
         cancelButton.click();
         return new DashBoardPage();
     }
